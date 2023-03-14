@@ -3,4 +3,16 @@
 <h1>Home</h1>
 <p><%= pageDescription %></p>
 
+<% posts.forEach((post) => { %>
+  <h1><%= post.title %></h1>
+  <% if (post.description.length < 100) { %>
+    <p><%= post.description %></p>
+  <% } else { %>
+    <p>
+      <%= post.description.substring(0, 100) + "..." %>
+      <a href="/post/<%= post.title %>">Read More</a>
+    </p>
+  <% } %>
+<% }) %>
+
 <%- include("partials/footer") -%>
