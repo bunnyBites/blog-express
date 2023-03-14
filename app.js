@@ -13,19 +13,39 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+app.get('/', (req, res) => {
+  res.render("home", { pageDescription: homeStartingContent });
 });
+
+// about section
+app.get('/about', (req, res) => {
+  res.render("about", { pageDescription: aboutContent});
+});
+
+// contact section
+app.get('/contact', (req, res) => {
+  res.render("contact", { pageDescription: contactContent });
+});
+
+// compose section
+app.get('/compose', (req, res) => {
+  res.render("compose");
+});
+
+app.post('/compose', (req, res) => {
+  const { postTitle, postDescription } = req.body;
+
+  console.log(postTitle, postDescription);
+})
+
+
+
+
+
+
+
+
+
+
+
+app.listen(3002, () => console.log("Server running on port 3002"))
