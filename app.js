@@ -52,8 +52,6 @@ app.get("/post/:name", (req, res) => {
 
   if (postForTheProvidedName.length) {
     res.render("post", { ...postForTheProvidedName[0] })
-  } else {
-    console.log("Match not found!");
   }
 })
 
