@@ -22,51 +22,31 @@ mongoose.connect("mongodb+srv://BunnyBites:BXLWLowi4E8tSd8R@devsandbox.q082xah.m
 .then(() => console.log("Mongo connection successfull!"));
 
 // create post schema
-const blogPostSchema = new mongoose.Schema({
-  pageName: String,
-  pageDescription: String,
-  posts: [{ title: String, description: String }]
+const PostSchema = new mongoose.Schema({
+  title: String,
+  description: String,
 });
 
 // create blog post modal
-const Blog = new mongoose.model("Blog", blogPostSchema);
+const Post = new mongoose.model("Post", PostSchema);
 
 app.get('/', (req, res) => {
-  Blog.findOne({ pageName: "Home" })
+  Post.find()
   .then((result) => {
     if (result) {
-      res.render("home", { pageDescription: result.pageDescription, posts: result.posts })
-    } else {
-      Blog.create({ pageName: "Home", pageDescription: homeStartingContent, posts: [] })
-        .then(() => res.redirect("/"));
+      res.render("home", { pageDescription: homeStartingContent, posts: result })
     }
   })
 });
 
 // about section
 app.get('/about', (req, res) => {
-  Blog.findOne({ pageName: "About"})
-  .then((result) => {
-    if (result) {
-      res.render("about", { pageDescription: result.pageDescription });
-    } else {
-      Blog.create({ pageName: "About", pageDescription: aboutContent })
-      .then(() => res.redirect("/about"));
-    }
-  })
+  res.render("about", { pageDescription: aboutContent });
 });
 
 // contact section
 app.get('/contact', (req, res) => {
-  Blog.findOne({ pageName: "Contact"})
-  .then((result) => {
-    if (result) {
-      res.render("contact", { pageDescription: result.pageDescription });
-    } else {
-      Blog.create({ pageName: "Contact", pageDescription: contactContent })
-      .then(() => res.redirect("/contact"));
-    }
-  })
+  res.render("contact", { pageDescription: contactContent });
 });
 
 // compose section
@@ -75,24 +55,16 @@ app.get('/compose', (req, res) => { res.render("compose"); });
 app.post('/compose', (req, res) => {
   const { title, description } = req.body;
 
-  Blog.findOne({ pageName: "Home"})
-  .then((result) => {
-    result.posts.push({ title, description });
-    result.save().then(() => res.redirect("/"));
-  });
+  Post.create({ title, description}).then(() => res.redirect('/'));
 })
 
 // new post
 app.get("/post/:postId", (req, res) => {
   const { postId } = req.params;
 
-  Blog.findOne({ pageName: "Home" })
+  Post.findOne({ _id: postId })
   .then((result) => {
-    if (result) {
-      const postForTheProvidedName = result.posts.filter((post) => post._id == String(postId))[0];
-
-      res.render("post", { title: postForTheProvidedName.title, description: postForTheProvidedName.description })
-    }
+    if (result) { res.render("post", { title: result.title, description: result.description }); }
   })
 });
 
