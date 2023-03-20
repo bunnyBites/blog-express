@@ -83,14 +83,13 @@ app.post('/compose', (req, res) => {
 })
 
 // new post
-app.get("/post/:name", (req, res) => {
-  const { name } = req.params;
+app.get("/post/:postId", (req, res) => {
+  const { postId } = req.params;
 
   Blog.findOne({ pageName: "Home" })
   .then((result) => {
     if (result) {
-      const preparedName = _.lowerCase(name);
-      const postForTheProvidedName = result.posts.filter((post) => _.lowerCase(post.title) === preparedName)[0];
+      const postForTheProvidedName = result.posts.filter((post) => post._id == String(postId))[0];
 
       res.render("post", { title: postForTheProvidedName.title, description: postForTheProvidedName.description })
     }

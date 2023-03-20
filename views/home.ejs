@@ -10,7 +10,7 @@
   <% } else { %>
     <p>
       <%= post.description.substring(0, 100) + "..." %>
-      <a href="/post/<%= post.title %>">Read More</a>
+      <a href="/post/<%= post._id %>">Read More</a>
     </p>
   <% } %>
 <% }) %>
