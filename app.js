@@ -15,7 +15,6 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-const posts = [];
 const port = (process.env.PORT || 3002);
 
 // connect with mongo
@@ -46,37 +45,56 @@ app.get('/', (req, res) => {
 
 // about section
 app.get('/about', (req, res) => {
-  res.render("about", { pageDescription: aboutContent});
+  Blog.findOne({ pageName: "About"})
+  .then((result) => {
+    if (result) {
+      res.render("about", { pageDescription: result.pageDescription });
+    } else {
+      Blog.create({ pageName: "About", pageDescription: aboutContent })
+      .then(() => res.redirect("/about"));
+    }
+  })
 });
 
 // contact section
 app.get('/contact', (req, res) => {
-  res.render("contact", { pageDescription: contactContent });
+  Blog.findOne({ pageName: "Contact"})
+  .then((result) => {
+    if (result) {
+      res.render("contact", { pageDescription: result.pageDescription });
+    } else {
+      Blog.create({ pageName: "Contact", pageDescription: contactContent })
+      .then(() => res.redirect("/contact"));
+    }
+  })
 });
 
 // compose section
-app.get('/compose', (req, res) => {
-  res.render("compose");
-});
+app.get('/compose', (req, res) => { res.render("compose"); });
 
 app.post('/compose', (req, res) => {
   const { title, description } = req.body;
 
-  posts.push({ title, description });
-
-  res.redirect('/');
+  Blog.findOne({ pageName: "Home"})
+  .then((result) => {
+    result.posts.push({ title, description });
+    result.save().then(() => res.redirect("/"));
+  });
 })
 
 // new post
 app.get("/post/:name", (req, res) => {
   const { name } = req.params;
-  const preparedName = _.lowerCase(name);
 
-  const postForTheProvidedName = posts.filter((post) => _.lowerCase(post.title) === preparedName);
+  Blog.findOne({ pageName: "Home" })
+  .then((result) => {
+    if (result) {
+      const preparedName = _.lowerCase(name);
+      const postForTheProvidedName = result.posts.filter((post) => _.lowerCase(post.title) === preparedName)[0];
 
-  if (postForTheProvidedName.length) {
-    res.render("post", { ...postForTheProvidedName[0] })
-  }
+      res.render("post", { title: postForTheProvidedName.title, description: postForTheProvidedName.description })
+    }
+  })
 });
 
 app.listen(port, () => console.log("Server running on port " + port))
